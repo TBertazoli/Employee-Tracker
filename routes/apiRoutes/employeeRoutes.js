@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../../db/connection');
 const inputCheck = require('../../utils/inputCheck');
 
-//route for all employess
+//route for all employees
 router.get('/employees', (req, res) => {
     const sql = `SELECT * FROM employee`;
 
