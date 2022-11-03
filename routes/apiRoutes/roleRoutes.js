@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../../db/connection');
 const inputCheck = require('../../utils/inputCheck');
 
+
 //route for all roles
 router.get('/roles', (req, res) => {
     const sql = `SELECT * FROM role`;

@@ -4,6 +4,7 @@ const db = require('../../db/connection');
 const inputCheck = require('../../utils/inputCheck');
 
 
+
 //route for all departments
 router.get('/departments', (req, res) => {
     const sql = `SELECT * FROM department`;
