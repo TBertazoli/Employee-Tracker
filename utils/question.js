@@ -39,7 +39,7 @@ function promptMenu() {
             type: 'list',
             name: 'menu',
             message: "What would you like to do?",
-            choices: ['Add an Employee', 'View all employees', 'Update an Employee Role', 'Update an employee Manager', 'View All Roles', 'Add a Role', 'View all departments', 'Add a Department', 'Quit']
+            choices: ['Add an Employee', 'View all employees', 'Update an Employee Role', 'Update an employee Manager', 'View All Roles', 'Add a Role', 'View all departments', 'Add a Department', 'Delete a Department', 'Quit']
         },
     ]).then(async (menuChoice) => {
         switch (menuChoice.menu) {
@@ -62,6 +62,8 @@ function promptMenu() {
                 return true;
             case 'Add a Department':
                 return await addDepartment();
+            case 'Delete a Department':
+                return await deleteDepartment();
             case 'Quit':
                 return false;
         }
@@ -235,12 +237,6 @@ async function updateEmployeeRole() {
 }
 
 async function updateEmployeeManager() {
-    const roles = (await getRoles()).map(r => {
-        return {
-            name: r.title,
-            value: r
-        }
-    });
     const employees = (await getEmployees()).map(e => {
         return {
             name: `${e.first_name} ${e.last_name}`,
@@ -351,6 +347,33 @@ async function addDepartment() {
                 console.err("Error adding the department");
             } else {
                 console.log("Department added.");
+            }
+        });
+        return true;
+    });
+}
+
+async function deleteDepartment() {
+    const department = (await getDepartments()).map(d => {
+        return {
+            name: d.name,
+            value: d
+        }
+    });
+    return inquirer.prompt([
+        {
+            type: 'list',
+            name: 'deletedepartment',
+            message: "What is the name of the Department?",
+            choices: department
+        }
+    ]).then((results) => {
+        const sql = `DELETE FROM department WHERE id = ? `;
+        db.execute(sql, [results.deletedepartment.id], (err) => {
+            if (err) {
+                console.err("Error deleting the department");
+            } else {
+                console.log("Department deleted");
             }
         });
         return true;
