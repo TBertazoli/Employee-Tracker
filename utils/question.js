@@ -39,7 +39,7 @@ function promptMenu() {
             type: 'list',
             name: 'menu',
             message: "What would you like to do?",
-            choices: ['Add an Employee', 'View all employees', 'Update an Employee Role', 'View All Roles', 'Add a Role', 'View all departments', 'Add a Department', 'Quit']
+            choices: ['Add an Employee', 'View all employees', 'Update an Employee Role', 'Update an employee Manager', 'View All Roles', 'Add a Role', 'View all departments', 'Add a Department', 'Quit']
         },
     ]).then(async (menuChoice) => {
         switch (menuChoice.menu) {
@@ -49,7 +49,9 @@ function promptMenu() {
                 viewAllEmployees();
                 return true
             case 'Update an Employee Role':
-                return await updateEmployeeRole();                
+                return await updateEmployeeRole();
+            case 'Update an employee Manager':
+                return await updateEmployeeManager();
             case 'View All Roles':
                 viewAllRoles()
                 return true;
@@ -59,7 +61,7 @@ function promptMenu() {
                 await viewAllDepartments();
                 return true;
             case 'Add a Department':
-                return await addDepartment();                          
+                return await addDepartment();
             case 'Quit':
                 return false;
         }
@@ -148,7 +150,7 @@ async function addEmployee() {
             type: 'input',
             name: 'lastname',
             message: "What is the last name? (Required)",
-            validate: lastNameInput  => {
+            validate: lastNameInput => {
                 if (lastNameInput) {
                     return true;
                 } else {
@@ -218,17 +220,58 @@ async function updateEmployeeRole() {
             message: "What is the new role?",
             choices: roles
         }
-    ]).then((r) => {    
-    const sql = `UPDATE employee SET role_id = ? WHERE id = ? `;
-    db.execute(sql, [r.newrole.id, r.chooseemployee.id], (err) => {
-        if (err) {
-            console.err("Error updating role");
-        } else {
-            console.log("New role added.");
+    ]).then((r) => {
+        const sql = `UPDATE employee SET role_id = ? WHERE id = ? `;
+        db.execute(sql, [r.newrole.id, r.chooseemployee.id], (err) => {
+            if (err) {
+                console.err("Error updating role");
+            } else {
+                console.log("New role added.");
+            }
+        });
+        return true;
+    });
+
+}
+
+async function updateEmployeeManager() {
+    const roles = (await getRoles()).map(r => {
+        return {
+            name: r.title,
+            value: r
         }
     });
-    return true;
-});
+    const employees = (await getEmployees()).map(e => {
+        return {
+            name: `${e.first_name} ${e.last_name}`,
+            value: e
+        }
+    });
+    return inquirer.prompt([
+        {
+            type: 'list',
+            name: 'chooseemployee',
+            message: "Choose the employee you would like to update?",
+            choices: employees
+
+        },
+        {
+            type: 'list',
+            name: 'newmanager',
+            message: "What is the new Manager?",
+            choices: employees
+        }
+    ]).then((r) => {
+        const sql = `UPDATE employee SET manager_id = ? WHERE id = ? `;
+        db.execute(sql, [r.newmanager.id, r.chooseemployee.id], (err) => {
+            if (err) {
+                console.err("Error updating manager");
+            } else {
+                console.log("New manager added.");
+            }
+        });
+        return true;
+    });
 
 }
 
