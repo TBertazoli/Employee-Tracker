@@ -243,6 +243,12 @@ async function updateEmployeeManager() {
             value: e
         }
     });
+    employees.push({
+        name: 'None',
+        value: {
+            id: null
+        }
+    });
     return inquirer.prompt([
         {
             type: 'list',
@@ -312,8 +318,7 @@ async function addRole() {
             choices: departments
         }
     ]).then((results) => {
-        const sql = `INSERT INTO role (title,salary,department_id) VALUES (?, ?, ?)`;
-        console.log([results.rolename, results.salary, results.choosedepartment.id]);
+        const sql = `INSERT INTO role (title,salary,department_id) VALUES (?, ?, ?)`;        
         db.execute(sql, [results.rolename, results.salary, results.choosedepartment.id], (err) => {
             if (err) {
                 console.err("Error adding the department");

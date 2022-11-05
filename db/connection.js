@@ -10,8 +10,7 @@ function connectDB() {
       // Your MySQL password
       password: 'CsCb$1se',
       database: 'employee_tracker'
-    },
-    console.log('Connected to the employee tracker database.')
+    },    
   );
 }
 
