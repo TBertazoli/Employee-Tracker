@@ -2,7 +2,7 @@
    
 
 ## Description
-This project is a Employee-Tracker written with node.js using mysql database. The user will go through a series of questions using the inquirer NPM package to interacte with database. The user can add employees, new roles and new department as well as check for all employees, departments and roles.
+This project is an Employee-Tracker written with node.js using mysql database. The user will go through a series of questions using the inquirer NPM package to interacte with the database. The user can add employees, new roles and new department as well as check for all employees, departments and roles.
 
 
 
