@@ -1,7 +1,8 @@
 const mysql = require('mysql2'); // to import mysql
 
   // Connect to database
-  const db = mysql.createConnection(
+function connectDB() {
+ return mysql.createConnection(
     {
       host: 'localhost',
       // Your MySQL username,
@@ -12,8 +13,10 @@ const mysql = require('mysql2'); // to import mysql
     },
     console.log('Connected to the employee tracker database.')
   );
+}
 
+const db = connectDB();
 
 module.exports = db;
-
+ 
 
