@@ -46,5 +46,5 @@ GitHub repository link: https://github.com/TBertazoli/Employee-Tracker
    
 email: tatianabertazoli@gmail.com
  
-Video link: 
+Video link: https://drive.google.com/file/d/1cuyhKoObsQ6gy35feF80WxuvCz8WvaCD/view
     

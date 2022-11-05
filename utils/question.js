@@ -77,6 +77,7 @@ async function viewAllEmployees() {
         } else {
             console.log('\n');
             console.table(results);
+            console.log('(Use arrows up or down to move back to menu)')
             console.log('\n\n\n\n\n\n\n\n');
         }
     });
@@ -89,6 +90,7 @@ function viewAllRoles() {
         } else {
             console.log('\n');
             console.table(results);
+            console.log('(Use arrows up or down to move back to menu)')
             console.log('\n\n\n\n\n\n\n\n\n');
         }
     });
@@ -97,6 +99,7 @@ function viewAllRoles() {
 async function viewAllDepartments() {
     const departments = await getDepartments();
     console.table(departments);
+    console.log('(Use arrows up or down to move back to menu)')
 }
 
 async function getRoles() {
@@ -181,8 +184,7 @@ async function addEmployee() {
             message: "Who is the employee manager?",
             choices: manager
         }
-    ]).then((r) => {
-        console.log(r);
+    ]).then((r) => {        
         const sql = `INSERT INTO employee (first_name,last_name,role_id,manager_id) VALUES (?,?,?,?) `;
         db.execute(sql, [r.firstname, r.lastname, r.role.id, r.manager.id], (err) => {
             if (err) {
@@ -318,7 +320,7 @@ async function addRole() {
             choices: departments
         }
     ]).then((results) => {
-        const sql = `INSERT INTO role (title,salary,department_id) VALUES (?, ?, ?)`;        
+        const sql = `INSERT INTO role (title,salary,department_id) VALUES (?, ?, ?)`;
         db.execute(sql, [results.rolename, results.salary, results.choosedepartment.id], (err) => {
             if (err) {
                 console.err("Error adding the department");
