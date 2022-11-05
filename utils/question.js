@@ -5,13 +5,13 @@ const express = require('express');
 let isPrompting = true;
 
 const allEmployeesQuery = `SELECT e.id, e.first_name, e.last_name, 
-r.title, d.name, r.salary, m.first_name as manager
+r.title, d.name AS department, r.salary, m.first_name as manager
 FROM employee e
 JOIN role r on e.role_id = r.id
 JOIN department d on r.department_id = d.id
 LEFT JOIN employee m on e.manager_id = m.id`;
 
-const allRolesQuery = `SELECT r.id, r.title, d.name as department, r.salary
+const allRolesQuery = `SELECT r.id, r.title, d.name AS department, r.salary
 FROM role r
 JOIN department d on r.department_id = d.id`;
 
@@ -46,10 +46,10 @@ function promptMenu() {
             case 'Add an Employee':
                 return await addEmployee();
             case 'View all employees':
-                viewAllEmployees()
+                viewAllEmployees();
                 return true
             case 'Update an Employee Role':
-                return true;
+                return await updateEmployeeRole();                
             case 'View All Roles':
                 viewAllRoles()
                 return true;
@@ -59,7 +59,7 @@ function promptMenu() {
                 await viewAllDepartments();
                 return true;
             case 'Add a Department':
-                return await addDepartment();
+                return await addDepartment();                          
             case 'Quit':
                 return false;
         }
@@ -111,7 +111,6 @@ async function getEmployees() {
     });
 }
 
-
 async function addEmployee() {
     const roles = (await getRoles()).map(r => {
         return {
@@ -136,8 +135,8 @@ async function addEmployee() {
             type: 'input',
             name: 'firstname',
             message: "What is the first name? (Required)",
-            validate: departmentInput => {
-                if (departmentInput) {
+            validate: firstNameInput => {
+                if (firstNameInput) {
                     return true;
                 } else {
                     console.log('You need to enter a first name!');
@@ -149,8 +148,8 @@ async function addEmployee() {
             type: 'input',
             name: 'lastname',
             message: "What is the last name? (Required)",
-            validate: departmentInput => {
-                if (departmentInput) {
+            validate: lastNameInput  => {
+                if (lastNameInput) {
                     return true;
                 } else {
                     console.log('You need to enter a first name!');
@@ -163,8 +162,8 @@ async function addEmployee() {
             name: 'role',
             message: "What is the employee role? (Required)",
             choices: roles,
-            validate: departmentInput => {
-                if (departmentInput) {
+            validate: roleInput => {
+                if (roleInput) {
                     return true;
                 } else {
                     console.log('You need to enter a first name!');
@@ -181,15 +180,56 @@ async function addEmployee() {
     ]).then((r) => {
         console.log(r);
         const sql = `INSERT INTO employee (first_name,last_name,role_id,manager_id) VALUES (?,?,?,?) `;
-        db.execute(sql, [r.firstname,r.lastname,r.role.id,r.manager.id], (err, department) => {
+        db.execute(sql, [r.firstname, r.lastname, r.role.id, r.manager.id], (err) => {
             if (err) {
-                console.err("Error adding the department");
+                console.err("Error adding employee");
             } else {
-                console.log("Department added.");
+                console.log("New Employee added.");
             }
         });
         return true;
     });
+}
+
+async function updateEmployeeRole() {
+    const roles = (await getRoles()).map(r => {
+        return {
+            name: r.title,
+            value: r
+        }
+    });
+    const employees = (await getEmployees()).map(e => {
+        return {
+            name: `${e.first_name} ${e.last_name}`,
+            value: e
+        }
+    });
+    return inquirer.prompt([
+        {
+            type: 'list',
+            name: 'chooseemployee',
+            message: "Choose the employee you would like to update?",
+            choices: employees
+
+        },
+        {
+            type: 'list',
+            name: 'newrole',
+            message: "What is the new role?",
+            choices: roles
+        }
+    ]).then((r) => {    
+    const sql = `UPDATE employee SET role_id = ? WHERE id = ? `;
+    db.execute(sql, [r.newrole.id, r.chooseemployee.id], (err) => {
+        if (err) {
+            console.err("Error updating role");
+        } else {
+            console.log("New role added.");
+        }
+    });
+    return true;
+});
+
 }
 
 async function getDepartments() {
@@ -235,7 +275,7 @@ async function addRole() {
     ]).then((results) => {
         const sql = `INSERT INTO role (title,salary,department_id) VALUES (?, ?, ?)`;
         console.log([results.rolename, results.salary, results.choosedepartment.id]);
-        db.execute(sql, [results.rolename, results.salary, results.choosedepartment.id], (err, department) => {
+        db.execute(sql, [results.rolename, results.salary, results.choosedepartment.id], (err) => {
             if (err) {
                 console.err("Error adding the department");
             } else {
@@ -263,7 +303,7 @@ async function addDepartment() {
         }
     ]).then((results) => {
         const sql = `INSERT INTO department (name) VALUES (?) `;
-        db.execute(sql, [results.departmentname], (err, department) => {
+        db.execute(sql, [results.departmentname], (err) => {
             if (err) {
                 console.err("Error adding the department");
             } else {
